@@ -1,19 +1,17 @@
 <script setup>
-import TextBlock from './TextBlock.vue';
 
-const text1 = defineModel('text1')
-const text2 = defineModel('text2')
+const textAfter = defineModel('textAfter')
 
 
 const clearText = () => {
-    text1.value = ''
-    text2.value = ''
+    document.getElementById('text-before').innerText = ''
+    textAfter.value = ''
 }
 
 const copyText = () => {
 let btn = document.getElementById('copy-btn')
 navigator.clipboard
-.writeText(text2.value)
+.writeText(textAfter.value)
 .then(() => {
     if (btn.innerText !== '✔ Готово') {
     const originalText = btn.innerText
@@ -27,39 +25,60 @@ navigator.clipboard
     alert('something went wrong')
 })
 }
+
+const inputText = (value) => {
+    textAfter.value = value
+}
+
 </script>
+
 
 <template>
 <div class="content">
     <div class="block">
         <button @click="clearText">Очистить текст</button>
-        <TextBlock id="textBefore" v-model="text1"/>
+        <div id="text-before" class="text-block" contenteditable="true" @input="inputText($event.target.innerHTML)"> </div>
     </div>
     <div class="block">
         <button @click="copyText" id="copy-btn">Скопировать</button>
-        <TextBlock id="textAfter" v-model="text2"/>
+        <div class="text-block"> {{ textAfter }} </div>
     </div>
 </div>
 </template>
 
 <style scoped>
-.content{
+
+.content {
     width: 86%;
     margin: 0 auto;
     display: flex;
     gap:100px;
 }
-.flex-between{
+
+.flex-between {
     display: flex;
     justify-content: space-between;
 }
-.block{
+
+.block {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap:35px;
 }
-button{
+
+.text-block{
+    width: 750px;
+    height: 600px;
+    border: 3px rgb(11, 163, 11) solid;
+    border-radius: 8px;
+    background-color: azure;
+    padding: 20px 10px 10px 30px;
+    white-space: normal;
+    overflow-y: scroll;
+}
+
+button {
     width: 200px;
     height: 50px;
     border-radius: 30px;
@@ -68,5 +87,8 @@ button{
     background-color: rgb(13, 209, 13);
     font-size: 16px;
     font-weight: 700;
+    cursor: pointer;
 }
+
+
 </style>

@@ -1,14 +1,14 @@
 <script setup>
 import TextBlockInterface from './components/TextBlockInterface.vue';
 import { ref } from 'vue';
-const textBefore = ref('')
+
 const textAfter = ref('')
 
 </script>
 
 <template>
 <div class="body">
-    <TextBlockInterface v-model:text1="textBefore" v-model:text2="textAfter"/>
+    <TextBlockInterface v-model:textAfter="textAfter"/>
 </div>
 </template>
 
