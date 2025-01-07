@@ -1,6 +1,8 @@
 <script setup>
-
+import {Parser} from '../assets/scripts/Parser.js'
 const textAfter = defineModel('textAfter')
+
+
 
 
 const clearText = () => {
@@ -27,7 +29,8 @@ navigator.clipboard
 }
 
 const inputText = (value) => {
-    textAfter.value = value
+    const parser = new Parser(value)
+    textAfter.value = parser.start()
 }
 
 </script>
@@ -41,7 +44,7 @@ const inputText = (value) => {
     </div>
     <div class="block">
         <button @click="copyText" id="copy-btn">Скопировать</button>
-        <div class="text-block"> {{ textAfter }} </div>
+        <div class="text-block" contenteditable="true"> {{ textAfter }} </div>
     </div>
 </div>
 </template>
@@ -74,8 +77,9 @@ const inputText = (value) => {
     border-radius: 8px;
     background-color: azure;
     padding: 20px 10px 10px 30px;
-    white-space: normal;
+    white-space: pre-line;
     overflow-y: scroll;
+    overflow-x:hidden;
 }
 
 button {
