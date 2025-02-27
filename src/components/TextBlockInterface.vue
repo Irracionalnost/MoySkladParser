@@ -1,9 +1,7 @@
 <script setup>
 import {Parser} from '../assets/scripts/Parser.js'
+import { ParserInterface } from '@/assets/scripts/ParserInterface.js'
 const textAfter = defineModel('textAfter')
-
-
-
 
 const clearText = () => {
     document.getElementById('text-before').innerText = ''
@@ -30,7 +28,8 @@ navigator.clipboard
 
 const inputText = (value) => {
     const parser = new Parser(value)
-    textAfter.value = parser.start()
+    const myinterface = new ParserInterface(parser.start(), "kladana")
+    textAfter.value = myinterface.start();
 }
 
 </script>
@@ -44,7 +43,7 @@ const inputText = (value) => {
     </div>
     <div class="block">
         <button @click="copyText" id="copy-btn">Скопировать</button>
-        <div class="text-block" contenteditable="true"> {{ textAfter }} </div>
+        <textarea class="text-block" v-model="textAfter"></textarea>
     </div>
 </div>
 </template>
@@ -70,7 +69,7 @@ const inputText = (value) => {
     gap:35px;
 }
 
-.text-block{
+.text-block {
     width: 750px;
     height: 600px;
     border: 3px rgb(11, 163, 11) solid;
@@ -80,6 +79,7 @@ const inputText = (value) => {
     white-space: pre-line;
     overflow-y: scroll;
     overflow-x:hidden;
+    font-size: 16px;
 }
 
 button {
