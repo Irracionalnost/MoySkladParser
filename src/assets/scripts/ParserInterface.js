@@ -56,6 +56,10 @@ export class ParserInterface {
                     this.result += this.rules.get("addLinksBlock")(element.value, target)
                     break
                 }
+                case "quote" : {
+                    this.result += this.rules.get("addQuote")(element.value, element.author, element.label)
+                    break
+                }
             }
         });
         return this.result;

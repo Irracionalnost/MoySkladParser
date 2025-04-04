@@ -5,6 +5,8 @@ const tp = new Typograf({
     htmlEntity: { type: 'name' },
 })
 
+tp.setSetting('common/nbsp/afterShortWord', 'lengthShortWord', 2);
+
 //добавление заголовка
 export function addHLevel(level, text){
     return (level == 2)? `<h${level} id="">${tp.execute(text)}</h${level}>\n\n` 
@@ -33,10 +35,11 @@ export function addContentTable(content){
     return result
 }
 
-//добавление списка ? Типограф
+//добавление списка
 export function addList(list) {
     let result = list.replaceAll(/(?<=<ul>)|(?<=<\/li>)|(?<=<\/ul>)|(?<=<ol>)|(?<=<\/ol>)/g, "\$&\n")
     result = result.replaceAll(/(?=<li>)/g, "    \$&")
+    result = tp.execute(result)
     return result += '\n'
 }
 
@@ -102,17 +105,34 @@ export function addAccentBlock(values){
     return result
 }
 
-//добавление блока с перелинковкой ? Типограф
+//добавление блока с перелинковкой
 export function addLinksBlock(values, target_blank){
     let result = '<div class="blog-post__accent">\n'
     result += '  <p class="is-bold">Read&#8209;alikes</p>\n'
     values.forEach((element) => {
         if (target_blank) 
             element.value = element.value.replaceAll(/<a\shref=".*"/g, '\$& target="_blank"')
-        result += `  ${element.value}\n`
+        result += `  ${tp.execute(element.value)}\n`
     })
     result += '</div>\n\n'
     return result
+}
+
+//добавление цитаты
+export function addQuote(text_arr, author, label) {
+    let result = '<figure class="blog-post__blockquote"\n>'
+    result += '  <blockquote>\n'
+    text_arr.forEach((elem) => {
+        result += addParagraph(elem)
+    })
+    result += '  </blockquote>\n'
+    result += '  <figcaption class="blog-post__blockquote-info">\n'
+    result += '    <div class="blog-post__blockquote-author">\n'
+    result += `      <div class="blog-post__blockquote-name">${author}</div>\n`
+    result += `      <div class="blog-post__blockquote-position">${label}</div>\n`
+    result += '    </div>\n'
+    result += '  </figcaption>\n'
+    result += '</figure>\n\n'
 }
 
 
@@ -128,4 +148,5 @@ kladana.set("addVideo", addVideo)
 kladana.set("addButton", addButton)
 kladana.set("addAccentBlock", addAccentBlock)
 kladana.set("addLinksBlock", addLinksBlock)
+kladana.set("addQuote", addQuote)
 

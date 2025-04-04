@@ -23,6 +23,7 @@ export class Parser {
         this.start_accent = false
         this.start_table_content = false
         this.start_links_block = false
+        this.start_quote = false
         this.result = []
         this.elems = []
     }
@@ -120,6 +121,10 @@ export class Parser {
                         this.result.push({type: 'links_block', value: this.start_links_block})
                         break
                     }
+
+                    // case (Quote.test(item)) : {
+                    //     this.Quote
+                    // }
 
                     //параграф
                     default: {
