@@ -37,8 +37,8 @@ export function addContentTable(content){
 
 //добавление списка
 export function addList(list) {
-    let result = list.replaceAll(/(?<=<ul>)|(?<=<\/li>)|(?<=<\/ul>)|(?<=<ol>)|(?<=<\/ol>)/g, "$&\n")
-    result = result.replaceAll(/(?=<li>)/g, "    $&")
+    let result = list.replaceAll(/(?<=<ul>)|(?<=<\/li>)|(?<=<\/ul>)|(?<=<ol>)|(?<=<\/ol>)/g, "\$&\n")
+    result = result.replaceAll(/(?=<li>)/g, "    \$&")
     result = tp.execute(result)
     return result += '\n'
 }
@@ -111,7 +111,7 @@ export function addLinksBlock(values, target_blank){
     result += '  <p class="is-bold">Read&#8209;alikes</p>\n'
     values.forEach((element) => {
         if (target_blank) 
-            element.value = element.value.replaceAll(/<a\shref=".*"/g, '$& target="_blank"')
+            element.value = element.value.replaceAll(/<a\shref=".*"/g, '\$& target="_blank"')
         result += `  ${tp.execute(element.value)}\n`
     })
     result += '</div>\n\n'
@@ -133,12 +133,11 @@ export function addQuote(text_arr, author, label) {
     result += '    </div>\n'
     result += '  </figcaption>\n'
     result += '</figure>\n\n'
-    return result
 }
 
 
 
-console.log(22);
+
 export const kladana = new Map ()
 kladana.set("addParagraph", addParagraph)
 kladana.set("addHLevel", addHLevel)
