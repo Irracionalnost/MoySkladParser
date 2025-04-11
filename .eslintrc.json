@@ -1,0 +1,31 @@
+{
+    "root": true,
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "extends": [
+        "plugin:vue/vue3-essential",
+        "eslint:recommended",
+        "plugin:prettier/recommended"
+    ],
+    "parser": "vue-eslint-parser",
+    "parserOptions": {
+        "ecmaVersion": 2020
+    },
+    "rules": {
+        "import/no-extraneous-dependencies": ["error", {"devDependencies": false, "optionalDependencies": false, "peerDependencies": false}],
+        "vue/multi-word-component-names": 0,
+        "vuejs-accessibility/label-has-for": 0,
+        "vuejs-accessibility/form-control-has-label": 0,
+        "vuejs-accessibility/click-events-have-key-events": 0,
+        "import/extensions": 0,
+        "max-classes-per-file": 0,
+        "import/no-unresolved": 0,
+        "max-len": ["error", { "code": 140 }],
+        "vuejs-accessibility/mouse-events-have-key-events": 0,
+        "prettier/prettier": "warn",
+        "semi": ["error", "always"],
+        "quotes": ["error", "single", { "avoidEscape": true }]
+    }
+}
