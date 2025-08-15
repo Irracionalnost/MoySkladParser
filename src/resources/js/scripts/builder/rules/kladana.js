@@ -118,24 +118,6 @@ export function addLinksBlock(values, target_blank){
     return result
 }
 
-//добавление цитаты
-export function addQuote(text_arr, author, label) {
-    let result = '<figure class="blog-post__blockquote"\n>'
-    result += '  <blockquote>\n'
-    text_arr.forEach((elem) => {
-        result += addParagraph(elem)
-    })
-    result += '  </blockquote>\n'
-    result += '  <figcaption class="blog-post__blockquote-info">\n'
-    result += '    <div class="blog-post__blockquote-author">\n'
-    result += `      <div class="blog-post__blockquote-name">${author}</div>\n`
-    result += `      <div class="blog-post__blockquote-position">${label}</div>\n`
-    result += '    </div>\n'
-    result += '  </figcaption>\n'
-    result += '</figure>\n\n'
-    return result;
-}
-
 
 export const kladana = new Map ()
 kladana.set("addParagraph", addParagraph)
@@ -147,5 +129,3 @@ kladana.set("addVideo", addVideo)
 kladana.set("addButton", addButton)
 kladana.set("addAccentBlock", addAccentBlock)
 kladana.set("addLinksBlock", addLinksBlock)
-kladana.set("addQuote", addQuote)
-

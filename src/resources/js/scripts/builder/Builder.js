@@ -1,6 +1,6 @@
-import { kladana } from "./templates/kladana"
+import { kladana } from "./rules/kladana"
 
-export class ParserInterface {
+export class Builder {
     constructor(inputObjects, template){
         this.rules = new Map();
         this.inputObjects = inputObjects
@@ -13,7 +13,6 @@ export class ParserInterface {
                 break
             }
         }
-
     }
 
     start() {
@@ -52,12 +51,8 @@ export class ParserInterface {
                     break
                 }
                 case "links_block" : {
-                    let target = (index + 1 != this.count_inputObjects)
-                    this.result += this.rules.get("addLinksBlock")(element.value, target)
-                    break
-                }
-                case "quote" : {
-                    this.result += this.rules.get("addQuote")(element.value, element.author, element.label)
+                    let last_elem = (index + 1 != this.count_inputObjects)
+                    this.result += this.rules.get("addLinksBlock")(element.value, last_elem)
                     break
                 }
             }
@@ -65,4 +60,3 @@ export class ParserInterface {
         return this.result;
     }
 }
-
