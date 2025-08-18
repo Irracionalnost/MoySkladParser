@@ -1,9 +1,11 @@
 import { createApp } from 'vue';
 import App from './resources/js/views/App.vue';
-import './resources/scss/app.scss';
 import { createWebHistory, createRouter } from 'vue-router';
-
 import Home from './resources/js/pages/Home.vue';
+
+import '@/resources/bootstrap/css/bootstrap.min.css';
+import '@/resources/styles/style.scss';
+import '@/resources/bootstrap/js/bootstrap.bundle.min.js';
 
 const routes = [{ path: '/home', component: Home }];
 

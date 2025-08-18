@@ -1,3 +1,3 @@
 <template>
-  <div><h1>footer</h1></div>
+  <div class="text-center mt-5"><p>все права защищены (честно)</p></div>
 </template>

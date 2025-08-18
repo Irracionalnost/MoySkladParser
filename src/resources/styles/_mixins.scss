@@ -1,0 +1,10 @@
+@mixin button-outline($color) {
+  border: 2px solid $color;
+  color: $color;
+  background: transparent;
+
+  &:hover {
+    background: $color;
+    color: white;
+  }
+}
