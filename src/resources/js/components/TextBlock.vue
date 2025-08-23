@@ -22,9 +22,9 @@ defineProps({
   background-color: var(--text-block-background);
   color: var(--text-block-color);
   border: 3px solid var(--text-block-border);
-  min-height: 650px;
+  height: 600px;
   width: 100%;
-  font-size: 18px;
+  font-size: 16px;
 
   &:focus {
     outline: none;
