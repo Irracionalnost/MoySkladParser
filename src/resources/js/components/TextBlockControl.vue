@@ -1,24 +1,28 @@
 <script setup>
-import { ref } from 'vue';
+import TextBlockHTML from './TextBlockHTML.vue';
 import TextBlock from './TextBlock.vue';
 
-const textBefore = ref('');
-const textAfter = ref('');
+const props = defineProps({
+  textBefore: {
+    type: String,
+    default: '',
+  },
+  textAfter: {
+    type: String,
+    default: '',
+  },
+});
+
+const emit = defineEmits(['clearText', 'updateTextBefore', 'updateTextAfter']);
 
 function clearText() {
-  textBefore.value = '';
-  textAfter.value = '';
-}
-
-function updateText(val) {
-  textBefore.value = val;
-  textAfter.value = val + '5';
+  emit('clearText');
 }
 
 function copyText() {
   let btn = document.getElementById('#copy_btn');
   navigator.clipboard
-    .writeText(textAfter.value)
+    .writeText(props.textAfter)
     .then(() => {
       if (btn.innerText !== '✔ Готово') {
         const originalText = btn.innerText;
@@ -54,10 +58,13 @@ function copyText() {
   </div>
   <div class="row mt-3 gap-5">
     <div class="col">
-      <TextBlock :text-value="textBefore" @update-value="(val) => updateText(val)" />
+      <TextBlockHTML
+        :text-before="textBefore"
+        @update-text="(val) => emit('updateTextBefore', val)"
+      />
     </div>
     <div class="col">
-      <TextBlock :text-value="textAfter" @update-value="(val) => (textAfter = val)" />
+      <TextBlock :value="textAfter" @update-text="(val) => emit('updateTextAfter', val)" />
     </div>
   </div>
 </template>
@@ -66,6 +73,7 @@ function copyText() {
 .btn {
   min-width: 150px;
   min-height: 40px;
+  font-size: 20px;
 
   &-primary {
     background-color: var(--button-background);

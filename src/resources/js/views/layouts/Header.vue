@@ -41,7 +41,7 @@
 }
 
 .nav-link {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 400;
   color: var(--header-text);
 
