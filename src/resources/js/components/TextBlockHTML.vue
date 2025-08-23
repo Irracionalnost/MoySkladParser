@@ -28,10 +28,32 @@ function handlePaste(e) {
   e.preventDefault();
   let html = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
   html = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['ul', 'ol', 'li', 'b', 'i', 'a', 'br', 'p'],
+    ALLOWED_TAGS: [
+      'ul',
+      'ol',
+      'li',
+      'b',
+      'i',
+      'a',
+      'br',
+      'p',
+      'table',
+      'tr',
+      'td',
+      'thead',
+      'tbody',
+    ],
     ALLOWED_ATTR: ['href', 'target'],
-  }).trim();
+  })
+    .trim()
+    .replaceAll('\n', ' ')
+    .replaceAll('\t', ' ')
+    .replaceAll('<p><br>  </p>', '')
+    .replaceAll(/<br>.*?(?=<)/g, '')
+    .replaceAll('<tr></tr>', '')
+    .replaceAll(/\s(?=\s)/g, '');
 
+  console.log(html);
   emit('updateText', html);
 }
 

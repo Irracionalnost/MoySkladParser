@@ -1,61 +1,147 @@
-import { ELEM } from "./global";
-import { LIST, HLEVEL, IMAGE, 
-  VIDEO, BUTTON, ACСENT_BLOCK,
-  ACСENT_BLOCK_PINK, ACСENT_BLOCK_WARNING,
-  ACCENT_BLOCK_QUOTE,  TABLE_OF_CONTENT,
+import { ELEM } from './global';
+import {
+  HLEVEL,
+  LIST,
+  IMAGE,
+  VIDEO,
+  BUTTON,
+  ACСENT_BLOCK,
+  ACСENT_BLOCK_PINK,
+  ACСENT_BLOCK_WARNING,
+  TABLE_OF_CONTENT,
   LINKS_BLOCK,
-} from "./global";
-
+  TABLE,
+} from './global';
 
 export class Parser {
   constructor(inputText) {
     this.text = inputText;
     this.start_accent = false;
-    this.start_table_content = false;
-    this.start_links_block = false;
-    this.start_quote = false;
     this.result = [];
     this.elems = [];
   }
 
-  cleanStyle() {
-    //удаление стилей браузера
-    this.text = this.text.replace(/^<span[^<]*/, '').replace(/<\/span>$/, '')
-      .replace(/(?<=<p)[^>]*/g, '');
-        
-    this.text = this.text
-      .replace(/<span style="([^"]*)(?=font-weight:\s700;)/g, '<b>$&')
-      .replace(/<b><span[^>]*>[^<]*<\/span>/g, '$&</b>')
-      .replace(/<span style="([^"]*)(?=font-style:\sitalic;)/g, '<i>$&')
-      .replace(/<i><span[^>]*>[^<]*<\/span>/g, '$&</i>');
-
-    this.text = this.text
-      .replace(/\sstyle="[^"]*"/g, '')
-      .replace(/\sdir="[^"]*"/g, '')
-      .replace(/<span>|<\/span>/g, '')
-      .replaceAll('</b><b>', '')
-      .replaceAll('</i><i>', '')
-      .replaceAll('</ul><ul>', '')
-      .replaceAll('</ol><ol>', '')
-      .replace(/(?<=<li)[^>]*/g, '')
-      .replaceAll('<div>', '')
-      .replaceAll('</div>', '')
-      .replaceAll('&nbsp;', '');
-
-    if (this.text[this.text.length - 1] !== '>')
-      this.text = `<p>${this.text}</p>`
-  }
-
   getAllElements() {
-    this.elems = this.text.match(ELEM);
-    // console.log('Распознаны элементы: ', this.elems);
+    let search = this.text.match(ELEM) || [];
+
+    search.forEach((item) => {
+      this.elems.push(item.replaceAll('<p>', '').replaceAll('</p>', '').trim());
+      this.elems = this.elems.filter((item) => item.trim() !== '');
+    });
+
+    console.log('Распознаны элементы: ', search);
   }
 
   //распознавание элементов и их свойств
   decodedElements() {
+    let item;
     try {
-      this.elems.forEach((item) => {
+      for (let i = 0; i < this.elems.length; i++) {
+        item = this.elems[i];
         switch (true) {
+          //заголовок
+          case HLEVEL.test(item): {
+            let lvl = item.match(/(?<=<h)\d(?=\s)|(?<=H)\d(?=\s)/i) || [];
+            let val = item.match(/(?<=(H|h)\d\s)[^<]*/i) || [];
+            this.result.push({ type: 'hlevel', level: lvl[0], value: val[0] });
+            break;
+          }
+
+          //список
+          case LIST.test(item): {
+            item = item
+              .replaceAll(/(<p>)|(<\/p>)/g, '')
+              .replaceAll(/((?<=>)\s+?(?=<))|(\s(?=\s))|(\s(?=<))/g, '');
+            this.result.push({ type: 'list', value: item });
+            break;
+          }
+
+          //содержание
+          case TABLE_OF_CONTENT.test(item): {
+            i++;
+            let content = [];
+            while (this.elems[i] && this.elems[i] !== ']') {
+              let elem = this.elems[i]
+                .replaceAll(/(<a[^>]*>)|(<\/a>)/g, '')
+                .replace(/(H|h)\d/, '')
+                .trim();
+              content.push(elem);
+              i++;
+            }
+            this.result.push({ type: 'table_of_content', value: content });
+            break;
+          }
+
+          // //блок с перелинковкой
+          case LINKS_BLOCK.test(item): {
+            i++;
+            let content = [];
+            while (this.elems[i] && this.elems[i] !== '}') {
+              let elem = this.elems[i].replace(/(H|h)\d/, '').trim();
+              content.push(elem);
+              i++;
+            }
+            this.result.push({ type: 'links_block', value: content });
+            break;
+          }
+
+          //изображение
+          case IMAGE.test(item): {
+            let label = item.replace('IMG', '').trim();
+            let img_url = this.elems[i + 1];
+            let jump = 1;
+            let title_tag = '';
+            let alt_tag = '';
+
+            if (this.elems[i + 2] && this.elems[i + 2].includes('Title')) {
+              title_tag = this.elems[i + 2]
+                .replaceAll(/(<b>)|(<\/b>)/g, '')
+                .replace(/.*(?=:):/, '')
+                .replaceAll('&nbsp;', '')
+                .trim();
+              console.log(title_tag);
+              jump += 1;
+            }
+            if (this.elems[i + 3] && this.elems[i + 3].includes('Alt')) {
+              alt_tag = this.elems[i + 3]
+                .replaceAll(/(<b>)|(<\/b>)/g, '')
+                .replace(/.*(?=:):/, '')
+                .replaceAll('&nbsp;', '')
+                .trim();
+              jump += 1;
+            }
+            this.result.push({
+              type: 'image',
+              url: img_url,
+              label: label,
+              title: title_tag,
+              alt: alt_tag,
+            });
+            i += jump;
+            break;
+          }
+
+          //видео
+          case VIDEO.test(item): {
+            let label = item.replace('YTB', '').trim();
+            let video_url = this.elems[i + 1];
+            this.result.push({ type: 'video', url: video_url, label: label });
+            i++;
+            break;
+          }
+
+          //кнопка
+          case BUTTON.test(item): {
+            item = item
+              .replaceAll(/(<b>)|(<\/b>)/g, '')
+              .replace('BTN', '')
+              .trim();
+            let url = item.match(/(?<=(href="))[^"]*/) || [''];
+            let label = item.replace(/<a\shref="[^>]*>/, '').replace('</a>', '');
+            this.result.push({ type: 'button', url: url[0], label: label });
+            break;
+          }
+
           //акцентный блок
           case ACСENT_BLOCK.test(item): {
             let color = 'simple';
@@ -68,104 +154,28 @@ export class Parser {
                 color = 'warning';
                 break;
               }
-              case ACCENT_BLOCK_QUOTE.test(item): {
-                color = 'quote';
-                break;
-              }
             }
             this.start_accent = !this.start_accent;
             this.result.push({ type: 'accent_block', value: this.start_accent, color: color });
             break;
           }
 
-          //содержание
-          case TABLE_OF_CONTENT.test(item): {
-            this.start_table_content = !this.start_table_content;
-            this.result.push({ type: 'table_of_content', value: this.start_table_content });
-            break;
-          }
-
-          //блок с перелинковкой
-          case LINKS_BLOCK.test(item): {
-            this.start_links_block = !this.start_links_block;
-            this.result.push({ type: 'links_block', value: this.start_links_block });
-            break;
-          }
-
-          //список
-          case LIST.test(item): {
-            item = item.replaceAll('<p>', '').replaceAll('</p>', '');
-            this.result.push({ type: 'list', value: item });
-            break;
-          }
-
-          //изображение
-          case IMAGE.test(item): {
-            let url_val = item.match(/(?<=<p>IMG\s<a href=")[^"]*/i) || [];
-            let label = item.match(/(?<=<\/a>\s*)[^<]*/) || [];
-            this.result.push({ type: 'image', url: url_val[0], label: label[0] });
-            break;
-          }
-
-          //видео
-          case VIDEO.test(item): {
-            let url_val = item.match(/(?<=<p>YTB\s<a href=")[^"]*/i) || [];
-            let label = item.match(/(?<=<\/a>\s*)[^<]*/) || [];
-            this.result.push({ type: 'video', url: url_val[0], label: label[0] });
-            break;
-          }
-
-          //кнопка
-          case BUTTON.test(item): {
-            let url_val = item.match(/(?<=<p>BTN\s<a href=")[^"]*/i) || [];
-            let label = item.match(/(?<=(BTN[^>]*>(<b>)*))[^<]+/i) || [];
-            this.result.push({ type: 'button', url: url_val[0], label: label[0] });
-            break;
-          }
-
-          //заголовок
-          case HLEVEL.test(item): {
-            let lvl = item.match(/(?<=<h)\d|(?<=H)\d/i) || [];
-            let val = item.match(/(?<=<h\d>h\d\s)[^<]*|(?<=<p>h\d\s)[^<]*/i) || [];
-            this.result.push({ type: 'hlevel', level: lvl[0], value: val[0] });
+          //таблица
+          case TABLE.test(item): {
+            this.result.push({ type: 'table', value: item });
             break;
           }
 
           //параграф
           default: {
-            let val = item.match(/(?<=<p>).*?(?=<\/p>)/) || [];
-            this.result.push({ type: 'paragraph', value: val[0].trim() });
+            this.result.push({ type: 'paragraph', value: item.trim() });
           }
         }
-      });
+      }
+      console.log(this.result);
     } catch (e) {
       console.log('parsing_first: Что-то пошло не так... ', e);
     }
-  }
-
-  //доп обработка элементов с вложенностью
-  decodedDeep() {
-    let key_words = ['table_of_content', 'links_block', 'accent_block'];
-    key_words.forEach((key_word) => {
-      let items_container = [];
-      let start_index = this.result.findIndex((item) => item.type == key_word);
-      if (start_index != -1) {
-        let color = this.result[start_index].color;
-        this.result.splice(start_index, 1);
-        let end_index = this.result.findIndex((item) => item.type == key_word);
-        this.result.splice(end_index, 1);
-
-        for (let i = start_index; i < end_index; i++) {
-          items_container.push(this.result[start_index]);
-          this.result.splice(start_index, 1);
-        }
-        this.result.splice(start_index, 0, {
-          type: key_word,
-          value: items_container,
-          color: color,
-        });
-      }
-    });
   }
 
   parsing() {
@@ -173,7 +183,6 @@ export class Parser {
       this.cleanStyle();
       this.getAllElements();
       this.decodedElements();
-      this.decodedDeep();
       console.log('Процесс парсинга завершён!');
       console.log(this.result);
     } catch (e) {

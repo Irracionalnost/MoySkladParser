@@ -13,10 +13,7 @@ defineProps({
   <textarea
     class="text-block px-4 py-3 rounded-4 overflow-y-auto"
     :value="textAfter"
-    @input="
-      emit('updateText', $event.target.value);
-      console.log($event);
-    "
+    @input="emit('updateText', $event.target.value)"
   ></textarea>
 </template>
 

@@ -4,17 +4,23 @@ import { ref } from 'vue';
 import TextBlockControl from '../components/TextBlockControl.vue';
 import DropList from '../components/DropList.vue';
 
+import { Parser } from '../scripts/parser/Parser';
+
 const mode = ref('moysklad');
 const textBefore = ref('');
 const textAfter = ref('');
 
-function updateTextBefore(val) {
-  textBefore.value = val;
-}
-
 function clear() {
   textBefore.value = '';
   textAfter.value = '';
+}
+
+function updateTextBefore(val) {
+  textBefore.value = val;
+
+  const parser = new Parser(textBefore.value);
+  parser.getAllElements();
+  parser.decodedElements();
 }
 
 function updateTextAfter(val) {
